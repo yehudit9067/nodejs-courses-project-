@@ -1,39 +1,37 @@
-const http = require('http');
+const express = require('express');
 
-// מערך הקורסים באנגלית
-const courses = [
-    { id: 1, name: "Mobile App Development", description: "Learn to build mobile applications from scratch" },
-    { id: 2, name: "Introduction to Computer Science", description: "Fundamentals of programming and algorithmic thinking" },
-    { id: 3, name: "Web Development with Node.js", description: "Advanced and fast back-end development" }
-];
+// ייבוא קבצי הנתונים המקומיים שיצרת בשלב הקודם
+const courses = require('./courses');
+const students = require('./students');
 
+const app = express();
 const PORT = 3000;
 
-// יצירת השרת
-const server = http.createServer((req, res) => {
-    // הגדרת כותרת תגובה שתומכת ב-JSON
-    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-    
-    // שליחת מערך הקורסים כטקסט JSON לדפדפן
-    res.end(JSON.stringify(courses, null, 2));
+// 1. הגדרת נתיב (Route) לכתובת הבית הראשית: http://localhost:3000
+// נתיב זה מחזיר אובייקט JSON פשוט עם מידע קצר ותיאור על השרת
+app.get('/', (req, res) => {
+    res.json({
+        status: "success",
+        message: "Welcome to the School API",
+        description: "This server manages courses and students data."
+    });
 });
 
-// הפעלת השרת וטעינה של chalk
-server.listen(PORT, async () => {
-    // טעינה דינמית של chalk שתואמת ל-CommonJS
+// 2. נתיב הקורסים: http://localhost:3000/courses
+app.get('/courses', (req, res) => {
+    // החזרת מערך הקורסים שייבאנו מהקובץ courses.js
+    res.json(courses);
+});
+
+app.get('/students', (req, res) => {
+    // החזרת מערך התלמידים שייבאנו מהקובץ students.js
+    res.json(students);
+});
+
+// הפעלת השרת וטעינת chalk לצורך הדפסה צבעונית בטרמינל
+app.listen(PORT, async () => {
     const { default: chalk } = await import('chalk');
 
-    console.log(chalk.blue.bold(`\n[Server] Running at: http://localhost:${PORT}`));
-    
-    // הדפסת רשימת הקורסים בצורה צבעונית בטרמינל
-    console.log(chalk.magenta.underline("\n=== Course List ==="));
-    
-    courses.forEach(course => {
-        console.log(
-            chalk.cyan(`ID: ${course.id}`) + ' | ' +
-            chalk.yellow.bold(`Name: ${course.name}`) + ' | ' +
-            chalk.white(`Description: ${course.description}`)
-        );
-    });
-    console.log(chalk.magenta("===================\n"));
+    console.log(chalk.blue.bold(`\n[Server] Express server is running at: http://localhost:${PORT}`));
+    console.log(chalk.green(`[Server] Press Ctrl+C to stop the server\n`));
 });
