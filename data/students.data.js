@@ -17,13 +17,15 @@ module.exports = {
         return newStudent;
     },
     update: (id, name, email) => {
-        const student = students.find(s => s.id === id);
-        if (student) {
-            student.name = name;
-            student.email = email;
-        }
-        return student;
-    },
+    const student = students.find(s => s.id === id);
+    if (!student) return null; // הגנה: החזרת null ברור אם הסטודנט לא קיים
+
+    // עדכון רק של השדות שנשלחו (מונע דריסה על ידי undefined)
+    if (name !== undefined) student.name = name;
+    if (email !== undefined) student.email = email;
+
+    return student;
+},
     remove: (id) => {
         const index = students.findIndex(s => s.id === id);
         if (index !== -1) {

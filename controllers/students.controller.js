@@ -22,14 +22,29 @@ module.exports = {
         res.status(201).json(newStudent);
     },
     update: (req, res) => {
-        const id = Number(req.params.id);
-        const { name, email } = req.body;
-        const updatedStudent = studentsService.updateStudent(id, name, email);
-        if (!updatedStudent) {
-            return res.status(400).json({ message: "Update failed. Check parameters and ID" });
-        }
-        res.json(updatedStudent);
-    },
+    const id = Number(req.params.id);
+    const { name, email } = req.body;
+
+    // 1. בדיקת תקינות הקלט - חייבים לקבל לפחות שדה אחד לעדכון
+    if (!name && !email) {
+        return res.status(400).json({ message: "At least one field (name or email) is required to update" });
+    }
+
+    // 2. בדיקה אם הסטודנט קיים במערכת
+    const studentExists = studentsService.getStudentById(id);
+    if (!studentExists) {
+        return res.status(404).json({ message: "Student not found for update" });
+    }
+
+    // 3. ביצוע העדכון
+    const updatedStudent = studentsService.updateStudent(id, name, email);
+    
+    if (!updatedStudent) {
+        return res.status(500).json({ message: "Failed to update student due to a server error" });
+    }
+
+    res.json(updatedStudent);
+},
     delete: (req, res) => {
         const id = Number(req.params.id);
         const deleted = studentsService.deleteStudent(id);

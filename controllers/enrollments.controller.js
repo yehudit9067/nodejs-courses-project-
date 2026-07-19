@@ -29,15 +29,21 @@ module.exports = {
     update: (req, res) => {
         const id = Number(req.params.id);
         const { studentId, courseId } = req.body;
-        if (!studentId || !courseId) {
+        //בדיקה אם ההרשמה קיימת בכלל במערכת
+                const enrollmentExists = enrollmentsService.getEnrollmentById(id);
+        if(!enrollmentExists){
+            return res.status(404).json({ message: "Enrollment not found for update" });
+        }
+                if (!studentId && !courseId) {
             return res.status(400).json({ message: "StudentId and courseId are required" });
         }
 
         try {
             const updatedEnrollment = enrollmentsService.updateEnrollment(id, Number(studentId), Number(courseId));
-            if (!updatedEnrollment) {
-                return res.status(404).json({ message: "Enrollment not found" });
-            }
+           //בדיקה זו כבר מיותרת
+            // if (!updatedEnrollment) {
+            //     return res.status(404).json({ message: "Enrollment not found" });
+            // }
             res.json(updatedEnrollment);
         } catch (error) {
             res.status(400).json({ message: error.message });

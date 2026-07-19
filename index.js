@@ -9,6 +9,31 @@ const enrollmentsRoutes = require('./routes/enrollments.routes');
 
 // מידלוור חובה לקבלת נתוני JSON בגוף הבקשה (POST/PUT)
 app.use(express.json());
+// ----------------------------------------------------
+// מידלוור אימות ולוגים גלובלי
+// ----------------------------------------------------
+app.use((req, res, next) => {
+    // הדפסת לוג ל-console עבור כל קריאה נכנסת
+    console.log(`[Request Log] ${req.method} --> ${req.url}`);
+
+    // הגדרת הערך הסודי המצופה בכותרת
+    const EXPECTED_AUTH_KEY = 'mySecretSchoolKey123';
+    
+    // שליפת הכותרת auth-key (Express ממיר אוטומטית לאותיות קטנות)
+    const clientAuthKey = req.get('auth-key');
+
+    // בדיקה האם הכותרת קיימת ותואמת לערך המצופה
+    if (!clientAuthKey || clientAuthKey !== EXPECTED_AUTH_KEY) {
+        return res.status(401).json({ 
+            status: "error", 
+            message: "Unauthorized: Missing or invalid auth-key header." 
+        });
+    }
+
+    // אם האימות הצליח, ממשיכים הלאה
+    next();
+});
+// ----------------------------------------------------
 
 // הגדרת נתיב (Route) בסיסי לכתובת הבית
 app.get('/', (req, res) => {
