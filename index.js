@@ -1,11 +1,36 @@
+//טעינת משתני הסביבה
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const PORT = 3000;
+
+//קליטת הפורט והמפתח הסודי
+const PORT = process.env.PORT || 3000;
+const secretKey = process.env.SECRET_KEY;
 
 // ייבוא הנתבים (Routes) של כל אחת מהישויות
 const coursesRoutes = require('./routes/courses.routes');
 const studentsRoutes = require('./routes/students.routes');
 const enrollmentsRoutes = require('./routes/enrollments.routes');
+
+//דוגמא לשימוש במפתח הסודי
+const myMiddleware = (req, res, next) => {
+  const userKey = req.headers['authorization'];
+  if (userKey === secretKey) {
+    next();
+  } else {
+    res.status(403).send('גישה נדחתה: מפתח סודי שגוי');
+  }
+};
+
+app.use(myMiddleware);
+
+app.get('/', (req, res) => {
+  res.send('הפרויקט פועל בהצלחה עם משתני סביבה!');
+});
+
+app.listen(PORT, () => {
+  console.log(`השרת רץ ומוזן בפורט ${PORT}`);
+});
 
 // מידלוור חובה לקבלת נתוני JSON בגוף הבקשה (POST/PUT)
 app.use(express.json());
