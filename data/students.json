@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "שם מלא 1",
+    "email": "email1@example.com"
+  },
+  {
+    "id": 2,
+    "name": "שם מלא 2",
+    "email": "email2@example.com"
+  }
+]

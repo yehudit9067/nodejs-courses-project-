@@ -31,7 +31,7 @@ module.exports = {
             return res.status(404).json({ message: "Student not found for update" });
         }
         //בדיקת תקינות הקלט שהתקבל מהלקוח
-        if (!name && !email) {
+        if (name === undefined && email === undefined) {
             return res.status(400).json({ message: "At least one field (name or email) is required to update" });
         }
         const updatedStudent = studentsService.updateStudent(id, name, email);

@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "Node.js Basics",
+    "duration": "40 hours"
+  },
+  {
+    "id": 2,
+    "name": "React Essentials",
+    "duration": "50 hours"
+  }
+]

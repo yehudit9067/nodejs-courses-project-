@@ -1,37 +1,53 @@
-let students = [
-    { id: 1, name: "Israel Israeli", email: "israel@example.com" },
-    { id: 2, name: "Sarah Levi", email: "sarah@example.com" }
-];
+const { readJson, writeJson } = require('../utils/fileStore');
+
+const FILE_NAME = 'students.json';
 
 module.exports = {
-    getAll: () => students,
-    getById: (id) => students.find(s => s.id === id),
-    exists: (id) => students.some(s => s.id === id),
-    create: (name, email) => {
-        const newStudent = {
-            id: students.length > 0 ? students[students.length - 1].id + 1 : 1,
-            name,
-            email
-        };
+    getAll: async () => {
+        return await readJson(FILE_NAME);
+    },
+
+    getById: async (id) => {
+        const students = await readJson(FILE_NAME);
+        return students.find(s => s.id === id);
+    },
+
+    // בדיקת קיום: מחזיר תמיד true/false, בלי לחשוף את האובייקט
+    exists: async (id) => {
+        const students = await readJson(FILE_NAME);
+        return students.some(s => s.id === id);
+    },
+
+    create: async (name, email) => {
+        const students = await readJson(FILE_NAME);
+        // מייצר ID ייחודי לפי ה-ID המקסימלי הקיים (עמיד למחיקות)
+        const nextId = students.length > 0 ? Math.max(...students.map(s => s.id)) + 1 : 1;
+        const newStudent = { id: nextId, name, email };
         students.push(newStudent);
+        await writeJson(FILE_NAME, students);
         return newStudent;
     },
-    update: (id, name, email) => {
-    const student = students.find(s => s.id === id);
-    if (!student) return null; // הגנה: החזרת null ברור אם הסטודנט לא קיים
 
-    // עדכון רק של השדות שנשלחו (מונע דריסה על ידי undefined)
-    if (name !== undefined) student.name = name;
-    if (email !== undefined) student.email = email;
+    update: async (id, name, email) => {
+        const students = await readJson(FILE_NAME);
+        const student = students.find(s => s.id === id);
+        if (!student) return null;
 
-    return student;
-},
-    remove: (id) => {
+        // עדכון חלקי: רק שדות שנשלחו
+        if (name !== undefined) student.name = name;
+        if (email !== undefined) student.email = email;
+
+        await writeJson(FILE_NAME, students);
+        return student;
+    },
+
+    remove: async (id) => {
+        const students = await readJson(FILE_NAME);
         const index = students.findIndex(s => s.id === id);
-        if (index !== -1) {
-            students.splice(index, 1);
-            return true;
-        }
-        return false;
+        if (index === -1) return false;
+
+        students.splice(index, 1);
+        await writeJson(FILE_NAME, students);
+        return true;
     }
 };
