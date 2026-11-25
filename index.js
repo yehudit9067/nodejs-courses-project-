@@ -3,6 +3,9 @@ require('dotenv').config({ path: require('path').join(__dirname, 'services', '.e
 const express = require('express');
 const app = express();
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
 //קליטת הפורט והמפתח הסודי
 const PORT = process.env.PORT || 3000;
 const secretKey = process.env.SECRET_KEY;
@@ -14,6 +17,8 @@ const enrollmentsRoutes = require('./routes/enrollments.routes');
 
 // מידלוור חובה לקבלת נתוני JSON בגוף הבקשה (POST/PUT)
 app.use(express.json());
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // ----------------------------------------------------
 // מידלוור אימות ולוגים גלובלי
 // ----------------------------------------------------

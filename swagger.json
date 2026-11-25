@@ -1,0 +1,115 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "School API - אימות",
+    "version": "1.0.0",
+    "description": "דף אימות לבקשות API. יש להזין authorization לפני כל בקשה."
+  },
+  "servers": [
+    { "url": "http://localhost:3000" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "authorization"
+      }
+    },
+    "schemas": {
+      "Student": {
+        "type": "object",
+        "properties": {
+          "id":       { "type": "integer", "example": 1 },
+          "name":     { "type": "string",  "example": "שם מלא 1" },
+          "email":    { "type": "string",  "example": "user1@example.com" }
+        }
+      },
+      "StudentInput": {
+        "type": "object",
+        "required": ["name", "email"],
+        "properties": {
+          "name":  { "type": "string", "example": "שם מלא 2" },
+          "email": { "type": "string", "example": "user2@example.com" }
+        }
+      }
+    }
+  },
+  "security": [ { "ApiKeyAuth": [] } ],
+  "paths": {
+    "/students": {
+      "get": {
+        "summary": "כל התלמידים",
+        "tags": ["students"],
+        "responses": {
+          "200": {
+            "description": "מערך תלמידים",
+            "content": { "application/json": {
+              "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Student" } }
+            }}
+          },
+          "500": { "description": "שגיאת שרת" }
+        }
+      },
+      "post": {
+        "summary": "יצירת תלמיד",
+        "tags": ["students"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": {
+            "schema": { "$ref": "#/components/schemas/StudentInput" }
+          }}
+        },
+        "responses": {
+          "201": { "description": "נוצר", "content": { "application/json": {
+            "schema": { "$ref": "#/components/schemas/Student" } } } },
+          "400": { "description": "קלט לא תקין" },
+          "500": { "description": "שגיאת שרת" }
+        }
+      }
+    },
+    "/students/{id}": {
+      "parameters": [
+        { "name": "id", "in": "path", "required": true,
+          "schema": { "type": "integer" }, "example": 1 }
+      ],
+      "get": {
+        "summary": "תלמיד לפי ID",
+        "tags": ["students"],
+        "responses": {
+          "200": { "description": "נמצא", "content": { "application/json": {
+            "schema": { "$ref": "#/components/schemas/Student" } } } },
+          "404": { "description": "לא נמצא" },
+          "500": { "description": "שגיאת שרת" }
+        }
+      },
+      "put": {
+        "summary": "עדכון חלקי",
+        "tags": ["students"],
+        "requestBody": {
+          "content": { "application/json": {
+            "schema": { "type": "object", "properties": {
+              "name":  { "type": "string", "example": "שם מלא 3" },
+              "email": { "type": "string", "example": "user3@example.com" }
+            } }
+          }}
+        },
+        "responses": {
+          "200": { "description": "מעודכן" },
+          "400": { "description": "לא נשלח אף שדה" },
+          "404": { "description": "לא נמצא" },
+          "500": { "description": "שגיאת שרת" }
+        }
+      },
+      "delete": {
+        "summary": "מחיקה",
+        "tags": ["students"],
+        "responses": {
+          "200": { "description": "נמחק" },
+          "404": { "description": "לא נמצא" },
+          "500": { "description": "שגיאת שרת" }
+        }
+      }
+    }
+  }
+}
